@@ -10,15 +10,12 @@ function Board({squares, xIsNext, onPlay,ResetGame}) {
     if (squares[i] || calculateWinner(squares)) {
       return;
     }
-
     const nextSquares = squares.slice(); 
-
     if (xIsNext) {
       nextSquares[i] = "X";
     } else {
       nextSquares[i] = "O";
     }
-
     onPlay(nextSquares);
   };
 
@@ -33,26 +30,24 @@ function Board({squares, xIsNext, onPlay,ResetGame}) {
   } else {
     status = 'Next player:' + (xIsNext ? "X" : "O");
   };
+  
+  const renderSquare = (i) => (
+    <Square key={i} value={squares[i]} onSquareClick={() => handleClick(i)} />
+  );
+
+  const renderBoardRow = (startIdx) => (
+    <div className="board-row" key={startIdx}>
+      {[0, 1, 2].map((col) => renderSquare(startIdx + col))}
+    </div>
+  );
+
+  const boardRows = [0, 3, 6].map((rowStart) => renderBoardRow(rowStart));
 
   return (
     <>
-      <div className="status">{status}</div>
-      <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
-      </div>
-      <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
-      </div>
-      <div>
+      <div className="status"><p>{status}</p></div>
+      {boardRows}
+      <div> 
         <button className='resetButton' onClick={ResetGame}>New Game</button>
       </div>
     </>
@@ -74,7 +69,6 @@ export default function Game() {
   function ResetGame() {
      setCurrentMove(0);
      setHistory([Array(9).fill(null)]);
-     console.log('reset');
   };
 
   function jumpTo(nextMove){
@@ -86,11 +80,13 @@ export default function Game() {
     if (move > 0){
       description = 'Vai alla mossa  ' + move;
     } else {
-      description = 'Vai a inizio partita'
+      description = 'Inizio partita'
     }
+    
     if(move === currentMove){
       return <li key={move} > {description} </li>
     }
+   
     return (
     <li key={move}>
       <button onClick={() => jumpTo(move)}>
